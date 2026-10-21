@@ -24,7 +24,15 @@ def action_value(mdp, state, action, values):
     - No vuelva a sumar la recompensa del terminal en su valor:
       values[terminal] es cero.
     """
+    
     # TODO: Add your code here
+    
+    total = 0.0
+    for successor, prob in mdp.transitions(state, action):
+        reward = mdp.reward(state, action, successor)
+        total += prob * (reward + mdp.discount * values[successor])
+    return total
+
     raise NotImplementedError("Complete este bloque TODO")
     # FIN DEL BLOQUE DEL ESTUDIANTE
 
@@ -53,8 +61,20 @@ def value_iteration(mdp, tolerance=1e-8, max_iterations=1000):
     values = dict.fromkeys(mdp.states, 0.0)
     history, deltas = [values.copy()], []
     for _ in range(max_iterations):
-        # TODO: Add your code here
-        raise NotImplementedError("Complete este bloque TODO")
+        new_values = {}
+        for state in mdp.states:
+            actions = mdp.actions(state)
+            if not actions:  # terminal: se mantiene en cero
+                new_values[state] = 0.0
+            else:
+                new_values[state] = max(
+                    action_value(mdp, state, a, values) for a in actions
+                )
+        delta = max(abs(new_values[s] - values[s]) for s in mdp.states)
+        values = new_values
+        converged = delta < tolerance
+        
+        
         # FIN DEL BLOQUE DEL ESTUDIANTE
         # Copias para la animación y empaquetado del resultado.
         history.append(values.copy())
@@ -74,6 +94,23 @@ def extract_policy(mdp, values):
     - Reutilice action_value: no basta elegir el vecino de mayor valor.
     - Respete mdp.actions: desempate N, E, S, W conservando el primero.
     """
-    # TODO: Add your code here
+    
+    policy = {}
+    
+    for state in mdp.states:
+        actions = mdp.actions(state)
+        if actions == ():
+            policy[state] = None
+        else:
+            best_action = None
+            best_value = float('-inf')
+            for action in actions:
+                q_value = action_value(mdp, state, action, values)
+                if q_value > best_value:
+                    best_value = q_value
+                    best_action = action
+            policy[state] = best_action
+    return policy
+  
     raise NotImplementedError("Complete este bloque TODO")
     # FIN DEL BLOQUE DEL ESTUDIANTE
