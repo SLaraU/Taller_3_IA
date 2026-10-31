@@ -102,7 +102,7 @@ def extract_policy(mdp, values):
             best_value = float('-inf')
             for action in actions:
                 q_value = action_value(mdp, state, action, values)
-                if q_value > best_value:
+                if q_value > best_value + 1e-9:
                     best_value = q_value
                     best_action = action
             policy[state] = best_action
